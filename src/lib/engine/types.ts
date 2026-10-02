@@ -154,6 +154,10 @@ export interface RetrievalResult {
   passes: PassTrace[]
   decision: Decision
   metrics: RetrievalMetrics
+  /** Which stage parsed the cue: the language-model parser or its deterministic fallback. Set by the API layer. */
+  parser?: 'neural' | 'deterministic'
+  /** Time the first-stage parse took, in milliseconds. Present only for the neural path. */
+  parseMs?: number
 }
 
 export interface ClarifyRequest {

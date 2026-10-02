@@ -3,10 +3,11 @@ import type { CueParse, DecisionKind, RetrievalResult } from './types'
 
 // ── Benchmark: replay research-grounded cue cases through the engine ────────
 // Cases 1 to 3 mirror the three live think-aloud tasks (P1, P2, P3) from the
-// interview study; case 4 embodies insight 2c (confident wrong dates); case 5
-// embodies 2d (visual cues that cannot become words); case 6 embodies G1
-// (photos living in chat apps); case 7 shows the honest baseline (classic
-// search works for known-item lookups); case 8 is the honest-failure case.
+// interview study. The rest embody the individual findings: 2c (confident
+// wrong dates and places), 2d (visual cues that cannot become words), G1
+// (photos living in chat apps), deleted targets, resigned memories,
+// event-anchored sequencing, and the honest baseline: classic search works
+// for known-item lookups, and honest failures stay explained.
 //
 // The classic column is a simulated exact-match keyword search over the same
 // synthetic library: literal token matching against tags, albums and dates,
@@ -90,6 +91,71 @@ export const BENCHMARK_CASES: BenchmarkCase[] = [
     groundedIn: 'Design target: a failed attempt must offer a recovery path. Resigned sentiment appears in 16 corpus items after silent failures.',
     expect: 'not_found',
     classicNote: 'Zero results, no explanation, no next step. This is the state people described as "I gave up".',
+  },
+  {
+    id: 'resigned-deleted',
+    title: 'Resigned memory, target deleted',
+    cue: "The family group photo at the old house during the festival, we were all in red. It's gone now anyway, I deleted it.",
+    groundedIn: 'Resigned sentiment follows silent failure (16 corpus items). Second deleted ghost: the engine must state existence, not sell a search.',
+    expect: 'out_of_scope_deleted',
+    classicNote: 'Deleted items are invisible to the classic box, so it returns zero and confirms the person\u2019s wrong belief that the photo is gone for good.',
+  },
+  {
+    id: 'trek-wrong-month',
+    title: 'Event remembered, month wrong by seasons',
+    cue: 'The trek. I think it was March, maybe April. It was freezing and there was snow on the summit.',
+    groundedIn: 'Companion to insight 2c: the event holds, the month drifts. The event anchor runs the trek against its real cluster date and the shift is shown.',
+    expect: 'found',
+    classicNote: 'March and April filters exclude October, where the only snow summit lives. Literal date boxes cannot recover from seasonal drift.',
+  },
+  {
+    id: 'chat-ticket',
+    title: 'G1: forwarded booking, not a camera photo',
+    cue: 'The train booking confirmation Ma forwarded me in January.',
+    groundedIn: 'G1: tickets, bookings and forwarded documents often live only in chats. Scope is checked before failure is declared.',
+    expect: 'out_of_scope_chat',
+    classicNote: 'A keyword box has no scope concept: it searches the gallery, finds nothing, and the ticket is written off as lost.',
+  },
+  {
+    id: 'string-lights-dinner',
+    title: 'Two moments fit, one question resolves',
+    cue: 'That dinner at night with all the little lights, near the beach I think.',
+    groundedIn: 'Move 3: when evidence splits across two albums, one question with the candidates attached replaces silent guessing.',
+    expect: 'found',
+    clarifyAlbum: 'Gokarna weekend',
+    classicNote: 'Both the wedding dinner and the beach shack carry lights and dinner. A ranked list alone cannot say which one she means.',
+  },
+  {
+    id: 'monsoon-chai',
+    title: 'Season plus activity, first try',
+    cue: 'That cup of chai watching the rain, monsoon time.',
+    groundedIn: 'Seasonal time plus an everyday activity: the small-moment re-finding the corpus asks for and classic search cannot serve.',
+    expect: 'found',
+    classicNote: 'Rain and chai are pixels, not captions. The words never sit in an album name, so the box has nothing to match.',
+  },
+  {
+    id: 'manali-snow',
+    title: 'Confidently wrong place, honest failure',
+    cue: "That snow trail near Manali, I'm sure it was Manali.",
+    groundedIn: 'Place names break the way dates do (2c). The failure is explained and the closest candidates are shown: the summit photos exist, and one look corrects the place name.',
+    expect: 'not_found',
+    classicNote: 'Zero results for Manali, silently. The person concludes the photo does not exist instead of doubting the place name.',
+  },
+  {
+    id: 'concert-crowd',
+    title: 'Crowd memory, relative time',
+    cue: 'The concert last year, we were somewhere in the crowd, purple lights everywhere.',
+    groundedIn: 'Event-scale visual memory (crowd, lights, color) with only relative time: the pattern behind the 12 AI-substitution corpus items.',
+    expect: 'found',
+    classicNote: 'Crowd and purple never co-occur as searchable words and "last year" is not a filterable value. The box returns nothing.',
+  },
+  {
+    id: 'mehndi-before-wedding',
+    title: 'Sequenced event, no date at all',
+    cue: 'The mehndi the day before the wedding, her hands full of henna.',
+    groundedIn: 'Event-anchored sequencing ("the day before") with no absolute time, matched against the library\u2019s real cluster dates.',
+    expect: 'found',
+    classicNote: '"Before" is not a keyword and no year or month is given, so the classic box has nothing to filter on.',
   },
 ]
 

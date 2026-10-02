@@ -89,8 +89,8 @@ export function PrototypeApp() {
       {/* ── Footer (sticky bottom) ─────────────────────────────── */}
       <footer className="mt-auto border-t border-border/70 bg-background">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-center text-xs text-muted-foreground sm:flex-row sm:px-6 sm:text-left">
-          <p>Cue First — a standalone prototype of the cue-first retrieval workflow, positioned as a feature concept for Google Photos.</p>
-          <p>Synthetic AI-generated library · part of the Recall photo-retrieval research program</p>
+          <p>Cue First: a standalone prototype of the cue-first retrieval workflow, positioned as a feature concept for Google Photos.</p>
+          <p>Synthetic photo library, no real user data · part of the Recall photo-retrieval research program</p>
         </div>
       </footer>
     </div>

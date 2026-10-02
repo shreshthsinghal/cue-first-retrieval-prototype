@@ -78,7 +78,7 @@ export function LibraryTab() {
 
       <p className="mt-8 flex items-start gap-2 rounded-xl border border-border bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
-        All photographs are AI-generated for evaluation; no real person&apos;s library is simulated. Deleted
+        All photographs are generated for evaluation; no real person&apos;s library is simulated. Deleted
         ghosts are retained in the manifest as existence records only, mirroring the research rule that
         deleted-photo cases stay adjacent and are never sold as a search problem.
       </p>

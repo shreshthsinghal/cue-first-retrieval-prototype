@@ -3,9 +3,11 @@ import type { CueParse, Setting, TimeHint } from './types'
 
 // ── Move 1: parse a memory dump into structured cues ────────────────────────
 // The parser accepts memory's native format: relative time, life-event
-// anchors, visual fragments, and hints that may be confidently wrong. It is
-// deliberately deterministic so the benchmark is reproducible; this module is
-// the adapter point where a production embedding/LLM parser would slot in.
+// anchors, visual fragments, and hints that may be confidently wrong.
+// It is stage 2 of a two-stage design: parse-llm.ts interprets live cues
+// with a language model, and this deterministic parser validates that frame,
+// stands in whenever the model is unreachable, and keeps the benchmark
+// reproducible.
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july',
   'august', 'september', 'october', 'november', 'december']
@@ -73,6 +75,10 @@ const TAG_PATTERNS: Array<[RegExp, string]> = [
   [/\b(graduation cap|cap and gown|the cap|caps?)\b/, 'cap'],
   [/\b(gown)\b/, 'gown'],
   [/\b(meme|forwarded|forward)\b/, 'forwarded'],
+  [/\b(family)\b/, 'family'],
+  [/\b(group)\b/, 'group'],
+  [/\b(festival|diwali|eid|christmas)\b/, 'festival'],
+  [/\b(house)\b/, 'house'],
 ]
 
 const EVENT_PATTERNS: Array<[RegExp, string[]]> = [

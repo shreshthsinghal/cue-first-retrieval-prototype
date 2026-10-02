@@ -67,7 +67,7 @@ export function RetrieveTab() {
     timers.current = []
   }
 
-  const run = useCallback(async (cueText: string, clarify?: { album: string | 'neither' }) => {
+  const run = useCallback(async (cueText: string, clarify?: { album: string | 'neither' }, carriedParse?: RetrievalResult['parse']) => {
     const trimmed = cueText.trim()
     if (!trimmed) return
     clearTimers()
@@ -86,7 +86,7 @@ export function RetrieveTab() {
       const res = await fetch('/api/retrieve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cue: trimmed, clarify }),
+        body: JSON.stringify({ cue: trimmed, clarify, parse: clarify ? carriedParse : undefined }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Something went wrong.')
@@ -115,7 +115,9 @@ export function RetrieveTab() {
 
   const answerClarify = (album: string | 'neither') => {
     if (!result) return
-    void run(result.parse.raw, { album })
+    // Carry the original parse so the follow-up run replays the exact frame
+    // the first run used (the neural stage is not asked twice for the same cue).
+    void run(result.parse.raw, { album }, result.parse)
   }
 
   return (
@@ -165,7 +167,7 @@ export function RetrieveTab() {
             </div>
           </Card>
 
-          {/* Example cues — the memory chips */}
+          {/* Example cues: the memory chips */}
           <div className="mt-6">
             <p className="mb-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">Try a memory from the research</p>
             <div className="flex flex-wrap gap-2">
@@ -208,7 +210,7 @@ export function RetrieveTab() {
           {phase === 'running' && (
             <motion.div key="running" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <StageRow active={stage >= 1} done={stage > 1} icon={Eye} title="Reading your memory" note="Accepting the cue in its own format: relative time, visual fragments, event anchors." />
-              <StageRow active={stage >= 2} done={stage > 2} icon={Layers} title="Running hypotheses in parallel" note="Literal time, event anchors, shifted date, content-only — none is trusted alone." />
+              <StageRow active={stage >= 2} done={stage > 2} icon={Layers} title="Running hypotheses in parallel" note="Literal time, event anchors, shifted date, content-only: none is trusted alone." />
               <StageRow active={stage >= 3} done={false} icon={CheckCheck} title="Deciding and explaining" note="Escalate automatically, clarify once at most, and explain whatever happens." />
             </motion.div>
           )}
@@ -300,11 +302,19 @@ function ParsePanel({ result, onReset }: { result: RetrievalResult; onReset: () 
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-xl font-semibold tracking-tight">What the workflow understood</h2>
+        {result.parser && (
+          <span
+            className="hidden rounded-full border border-border bg-muted/60 px-3 py-1 text-[11px] font-medium text-muted-foreground sm:inline"
+            title={result.parser === 'neural' ? 'A language model interpreted the memory dump into this frame; the deterministic parser validated it.' : 'The deterministic vocabulary parser produced this frame (the neural parser was unreachable or returned an invalid frame).'}
+          >
+            {result.parser === 'neural' ? `neural parse${typeof result.parseMs === 'number' ? ` · ${result.parseMs} ms` : ''}` : 'deterministic parse (fallback)'}
+          </span>
+        )}
         <Button variant="ghost" size="sm" onClick={onReset} className="text-muted-foreground">
           <RotateCcw className="h-3.5 w-3.5" aria-hidden /> New memory
         </Button>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">Accepted exactly as written — no field-filling, no keywords required.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Accepted exactly as written: no field-filling, no keywords required.</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {chips.map((c, i) => (
           <motion.span
@@ -482,7 +492,7 @@ function TracePanel({ result, open, onToggle }: { result: RetrievalResult; open:
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card">
       <button onClick={onToggle} className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left" aria-expanded={open}>
-        <span className="text-sm font-semibold">Full search trace — every hypothesis, window and count</span>
+        <span className="text-sm font-semibold">Full search trace: every hypothesis, window and count</span>
         <ChevronDown className={cn('h-4 w-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} aria-hidden />
       </button>
       {open && (
@@ -509,7 +519,7 @@ function TracePanel({ result, open, onToggle }: { result: RetrievalResult; open:
                         <td className="px-3 py-2.5 font-medium">{r.label}</td>
                         <td className="px-3 py-2.5 text-muted-foreground">{r.windowsScanned.length ? r.windowsScanned.join('; ') : 'none (content only)'}</td>
                         <td className="px-3 py-2.5 text-right font-mono">{r.hits}</td>
-                        <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">{r.topIds.join(', ') || '—'}</td>
+                        <td className="px-3 py-2.5 font-mono text-xs text-muted-foreground">{r.topIds.join(', ') || 'none'}</td>
                       </tr>
                     ))}
                   </tbody>

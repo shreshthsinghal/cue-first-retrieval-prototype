@@ -14,13 +14,13 @@ const MOVES: Array<{ n: string; title: string; impl: string; evidence: string }>
   {
     n: '01',
     title: 'Accept the memory as-is',
-    impl: 'parse.ts: a deterministic cue parser over the library\u2019s attribute vocabulary. Time hints (absolute, seasonal, event-anchored, vague), events, colors, settings, fragments, people, and chat-origin scope hints. In production this module is the adapter point for an embedding or LLM parser.',
+    impl: 'Two-stage parsing. A language-model parser reads the dump exactly as written and returns the structured frame (time hints, events, colors, settings, fragments, people, scope hints); parse.ts validates that frame against the library\u2019s vocabulary and stands in as the deterministic fallback, so the benchmark stays reproducible and the API never hard-fails.',
     evidence: 'Memory keeps relative, event-anchored, visual cues [9][10]; the search box is skipped rather than misused (3 of 3 live tasks).',
   },
   {
     n: '02',
     title: 'Run parallel hypotheses',
-    impl: 'retrieve.ts: four hypotheses per cue \u2014 literal time, event anchors against real cluster dates, a shifted window for wrong dates, and content-only ranking \u2014 scored over every item with evidence recorded per feature.',
+    impl: 'retrieve.ts: four hypotheses per cue, literal time, event anchors against real cluster dates, a shifted window for wrong dates, and content-only ranking, all scored over every item with evidence recorded per feature.',
     evidence: 'Dates held with confidence were wrong 2 of 3 times (insight 2c); encoding specificity says retrieval succeeds when the cue matches encoding [9].',
   },
   {
@@ -32,15 +32,16 @@ const MOVES: Array<{ n: string; title: string; impl: string; evidence: string }>
   {
     n: '04',
     title: 'Explain every outcome',
-    impl: 'Five terminal states \u2014 found, clarify, honest not-found, out-of-scope deleted, out-of-scope chat \u2014 all carrying an explanation, evidence chips on each result, and a full search trace (every hypothesis, window, count).',
+    impl: 'Five terminal states (found, clarify, honest not-found, out-of-scope deleted, out-of-scope chat), all carrying an explanation, evidence chips on each result, and a full search trace (every hypothesis, window, count).',
     evidence: 'Silent failure produced resignation (16 corpus items) and app-switching (3 of 3). G1: photos live outside Photos (2 of 3); one live target was deleted.',
   },
 ]
 
 const REAL_VS_SIM = [
-  { real: true, text: 'The retrieval workflow itself: parsing, hypotheses, scoring, escalation, clarification and explanations are the real deterministic engine this prototype ships (verified by tests/engine-check.ts).' },
-  { real: true, text: 'The eight benchmark cases and their scripted clarification answers, derived from the interview round 1 live tasks and insights.' },
-  { real: false, text: 'The library: 40 AI-generated photos for one synthetic persona. Real-library scale, noise and personal history are not simulated.' },
+  { real: true, text: 'The retrieval workflow itself: two-stage parsing, hypotheses, scoring, escalation, clarification and explanations are the real engine this prototype ships (verified by tests/engine-check.ts).' },
+  { real: true, text: 'The first-stage parser: a language model interprets every live cue into the structured frame; the deterministic vocabulary parser validates it and takes over whenever the model is unreachable or returns an invalid frame.' },
+  { real: true, text: 'The sixteen benchmark cases and their scripted clarification answers, derived from the interview round 1 live tasks and insights.' },
+  { real: false, text: 'The library: 40 generated photos for one synthetic persona. Real-library scale, noise and personal history are not simulated.' },
   { real: false, text: 'The classic-search baseline: a literal AND-match keyword simulation over the same library. Real classic search differs in ranking detail, not in the documented failure mode.' },
   { real: false, text: 'Cross-app scope awareness is interaction design only: the prototype redirects to the chat-app hypothesis (G1) but cannot search WhatsApp or Snapchat.' },
 ]
@@ -128,7 +129,7 @@ export function MethodTab({ onNavigate }: { onNavigate: (tab: TabKey) => void })
               3,646 public items mined and classified (YouTube 2,226, Play Store 1,345, survey 75); 158 on-target;
               899 observations coded. Interview round 1: 4 sessions, 3 counted, 81 answers, 3 live tasks, 0 of 3
               finds, 0 reformulations. Top re-ranked opportunity: content plus approximate-time hybrid search,
-              requested by 3 of 3 — exactly what Move 2 implements first.
+              requested by 3 of 3, exactly what Move 2 implements first.
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
               <button onClick={() => onNavigate('benchmark')} className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-background px-3.5 py-1.5 text-xs font-medium hover:bg-accent">
@@ -151,7 +152,7 @@ export function MethodTab({ onNavigate }: { onNavigate: (tab: TabKey) => void })
       <section className="mt-10">
         <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs">Positioning</Badge>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          This is a standalone prototype of an <span className="font-medium text-foreground/90">AI-powered retrieval workflow</span> —
+          This is a standalone prototype of an <span className="font-medium text-foreground/90">AI-powered retrieval workflow</span>:
           the only solution shape on the option list that is a mechanism rather than a container (a feature within
           Google Photos), a surface (a conversational experience), or an execution strategy (an agent). It is
           designed and argued as a drop-in feature concept for Google Photos: every interaction here is arguable

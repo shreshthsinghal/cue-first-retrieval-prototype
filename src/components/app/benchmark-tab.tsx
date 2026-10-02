@@ -1,6 +1,6 @@
 'use client'
 
-// Benchmark: replay the eight research-grounded cue cases through the engine
+// Benchmark: replay the sixteen research-grounded cue cases through the engine
 // and show the classic-keyword baseline side by side. Served by /api/benchmark.
 
 import { useEffect, useState } from 'react'
@@ -61,8 +61,9 @@ export function BenchmarkTab() {
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:py-12">
       <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Benchmark: the research, replayed</h1>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        Eight cue cases built from the study: three mirror the live think-aloud tasks (P1 to P3), the rest embody
-        individual insights (confident wrong dates 2c, non-verbalizable visual memory 2d, chat-app scope G1).
+        Sixteen cue cases built from the study: three mirror the live think-aloud tasks (P1 to P3), the rest embody
+        individual findings (confident wrong dates and places 2c, non-verbalizable visual memory 2d, chat-app scope
+        G1, deleted targets, resigned memories, event-anchored sequencing).
         The classic column is a literal keyword search over the same library: every content word of the query must
         appear in the photo&apos;s searchable text, and deleted photos are invisible to it. In the live study,
         the baseline outcome was 0 of 3 finds with 0 reformulations.
@@ -85,7 +86,7 @@ export function BenchmarkTab() {
           {/* Summary strip */}
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Stat label="Cases resolved with an explanation" value={`${data.summary.cases - data.summary.honestNotFound}/${data.summary.cases}`} sub="found or out-of-scope, stated" />
-            <Stat label="Found outright" value={`${data.summary.found}`} sub="plus 1 honest failure, fully traced" />
+            <Stat label="Found outright" value={`${data.summary.found}`} sub="plus honest failures, fully traced" />
             <Stat label="Clarifications used" value={`${data.summary.clarificationsUsed}`} sub="budget: one per case, max" />
             <Stat label="Classic search silent-fails" value={`${data.summary.classicSilent}/${data.summary.cases}`} sub={`${data.summary.classicFound} case works, kept on purpose`} />
           </div>
@@ -189,7 +190,8 @@ export function BenchmarkTab() {
           <p className="mt-8 rounded-xl border border-border bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
             The classic baseline is a simulation of literal keyword matching, run honestly over the same synthetic
             library; real libraries are thousands of times larger, where silent misses are harder to escape by
-            scrolling. The engine column is the real deterministic engine this prototype ships, not a mock.
+            scrolling. The engine column replays with the deterministic parser so every run is reproducible; live
+            Retrieve calls are interpreted by the language-model parser first, with that same parser as fallback.
           </p>
         </>
       )}

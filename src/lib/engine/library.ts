@@ -6,7 +6,7 @@ import type { Photo } from './types'
 // screenshots, and two deleted photos kept as existence records (the 154
 // deleted-photo items in the corpus stay adjacent, never sold as a search
 // problem). Every benchmark case resolves against this manifest, so the
-// manifest is the retrieval ground truth. All photos are AI-generated for
+// manifest is the retrieval ground truth. All photos are generated for
 // evaluation; no real person's library is simulated.
 
 const P = (p: Photo): Photo => p
@@ -79,7 +79,7 @@ export const PHOTOS: Photo[] = [
   }),
   P({
     id: 'IMG_20241215_2105', src: '/photos/w4.jpg', date: '2024-12-15', album: "Anjali's wedding · Goa",
-    events: ['wedding'], tags: ['wedding', 'dinner', 'table', 'string-lights', 'food'],
+    events: ['wedding'], tags: ['wedding', 'dinner', 'table', 'fairy-lights', 'food'],
     colors: ['orange'], setting: 'outdoor', people: 8, timeOfDay: 'night', origin: 'camera',
     width: 1344, height: 768,
   }),
@@ -157,7 +157,7 @@ export const PHOTOS: Photo[] = [
   }),
   P({
     id: 'IMG_20260214_2059', src: '/photos/be4.jpg', date: '2026-02-14', album: 'Gokarna weekend',
-    events: ['beach-trip'], tags: ['beach', 'shack', 'dinner', 'string-lights', 'night', 'food'],
+    events: ['beach-trip'], tags: ['beach', 'shack', 'dinner', 'fairy-lights', 'night', 'food'],
     colors: ['orange'], setting: 'beach', people: 6, timeOfDay: 'night', origin: 'camera',
     width: 1344, height: 768,
   }),
@@ -197,13 +197,13 @@ export const PHOTOS: Photo[] = [
   // ── Mumbai weekend · August 2025 ──────────────────────────────────────────
   P({
     id: 'IMG_20250823_2104', src: '/photos/c1.jpg', date: '2025-08-23', album: 'Mumbai weekend',
-    events: ['city-trip'], tags: ['concert', 'crowd', 'stage', 'lights', 'music'],
+    events: ['city-trip'], tags: ['concert', 'crowd', 'stage', 'fairy-lights', 'music'],
     colors: ['purple'], setting: 'city', people: 50, timeOfDay: 'night', origin: 'camera',
     width: 1344, height: 768,
   }),
   P({
     id: 'IMG_20250823_1945', src: '/photos/c2.jpg', date: '2025-08-23', album: 'Mumbai weekend',
-    events: ['city-trip'], tags: ['skyline', 'night', 'city', 'lights'],
+    events: ['city-trip'], tags: ['skyline', 'night', 'city', 'fairy-lights'],
     colors: ['orange'], setting: 'city', people: 0, timeOfDay: 'night', origin: 'camera',
     width: 1344, height: 768,
   }),

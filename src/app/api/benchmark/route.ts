@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import { BENCHMARK_CASES, runCase } from '@/lib/engine/benchmark'
 import type { CaseOutcome } from '@/lib/engine/benchmark'
 
-// POST /api/benchmark — replay every research-grounded cue case through the
+// GET /api/benchmark: replay every research-grounded cue case through the
 // engine and return outcomes plus the classic-search baseline. Deterministic:
-// the run is pure and instant.
+// the run is pure and instant, parsed by the deterministic stage so replays
+// are reproducible.
 export async function GET() {
   try {
     const outcomes: CaseOutcome[] = BENCHMARK_CASES.map(runCase)

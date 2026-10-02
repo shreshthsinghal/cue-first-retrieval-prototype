@@ -18,7 +18,7 @@ import type {
 // - Time windows are candidates, never hard filters: 2 of 3 participants held
 //   wrong dates with confidence, so a literal window miss must not kill a run.
 // - The system escalates before it asks: pass 2 widens windows and relaxes
-//   attributes automatically (0 reformulations observed — users will not do
+//   attributes automatically (0 reformulations observed: users will not do
 //   this work themselves).
 // - One clarification maximum, with the evidence attached.
 // - No outcome is silent: found, clarify, not-found and both out-of-scope
@@ -317,6 +317,8 @@ const GROUNDING = {
 
 export interface RetrieveOptions {
   clarify?: { album: string | 'neither' }
+  /** A pre-parsed frame (from parse-llm.ts, or carried back on clarify). When absent, the deterministic parser runs. */
+  parse?: CueParse
 }
 
 type DecisionOrEscalate = Decision | { kind: '__escalate' }
@@ -326,7 +328,7 @@ const isEscalate = (d: DecisionOrEscalate): d is { kind: '__escalate' } =>
 
 export function retrieve(cue: string, opts: RetrieveOptions = {}): RetrievalResult {
   const started = Date.now()
-  const parse = parseCue(cue)
+  const parse = opts.parse ?? parseCue(cue)
   const hypotheses = buildHypotheses(parse)
   const passes: PassTrace[] = []
 
@@ -334,7 +336,7 @@ export function retrieve(cue: string, opts: RetrieveOptions = {}): RetrievalResu
   const neither = opts.clarify?.album === 'neither'
   const clarifyAlbum = clarified && !neither ? (opts.clarify!.album as string) : null
 
-  const pass1 = runPass(parse, hypotheses, 1, 'Initial run: literal time, event anchors, shifted date, content-only — all in parallel.', [], clarifyAlbum)
+  const pass1 = runPass(parse, hypotheses, 1, 'Initial run: literal time, event anchors, shifted date, content-only, all in parallel.', [], clarifyAlbum)
   passes.push(pass1.trace)
   let scoredMap = pass1.scored
   let decision = decide(parse, hypotheses, scoredMap, { passes: passes.length, clarified, neither })
@@ -449,7 +451,7 @@ function decide(
   if (top && parse.scopeHints.includes('chat') && top.photo.origin === 'screenshot' && top.score >= CLARIFY_T) {
     return {
       kind: 'out_of_scope_chat',
-      headline: 'This is chat-app content — it may never have lived in Photos',
+      headline: 'This is chat-app content and may never have lived in Photos',
       explanation: `The best match is ${top.photo.id}, a screenshot. Your description sounds like received or forwarded content, and 2 of 3 participants keep that content in WhatsApp or Snapchat, not the gallery. Checking scope before searching is the gate question the research says people skip.`,
       results: [top],
       groundedIn: GROUNDING.chat,
