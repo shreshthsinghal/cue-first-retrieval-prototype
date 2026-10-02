@@ -96,7 +96,13 @@ export async function parseCueLLM(raw: string, timeoutMs = 9000): Promise<ParseO
 
 async function requestFrame(raw: string): Promise<unknown> {
   const { default: ZAI } = await import('z-ai-web-dev-sdk')
-  const zai = await ZAI.create()
+  // The SDK loads its credentials from a .z-ai-config file. Where that file is
+  // absent (hosted deploys), an equivalent JSON config can be supplied through
+  // the ZAI_CONFIG environment variable: { "baseUrl": "...", "apiKey": "..." }.
+  // Any failure here resolves to null upstream and the deterministic parser
+  // takes over.
+  const envConfig = process.env.ZAI_CONFIG
+  const zai = envConfig ? new ZAI(JSON.parse(envConfig)) : await ZAI.create()
   const completion = await zai.chat.completions.create({
     messages: [
       { role: 'assistant', content: SYSTEM_PROMPT },

@@ -118,6 +118,11 @@ Run it: `bun tests/engine-check.ts`
 Stack: Next.js, React, TypeScript, Tailwind. Deploys as a single Vercel project with no
 database and no authentication by design: a public research artifact over a synthetic library.
 
+Parser credentials: the SDK reads a `.z-ai-config` file where one exists. On hosted deploys
+without that file, set a `ZAI_CONFIG` environment variable containing the same JSON
+(`{ "baseUrl": "...", "apiKey": "..." }`) and the neural stage runs in production too;
+without it, the deterministic stage serves every request, which is the documented fallback.
+
 ## 8. What is real, what is simulated
 
 Real: the workflow itself, the two-stage parsing, scoring, escalation, clarification, and
