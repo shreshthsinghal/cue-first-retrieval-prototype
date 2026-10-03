@@ -63,7 +63,7 @@ const monthLabel = (iso: string) =>
 
 function eventAnchorWindows(parse: CueParse): Array<{ years: number[]; months: number[]; label: string }> {
   const clusters = new Set<string>()
-  for (const p of PHOTOS) {
+  for (const p of LIB) {
     for (const e of p.events) if (parse.events.includes(e)) clusters.add(`${e}:${p.date.slice(0, 7)}`)
   }
   const windows: Array<{ years: number[]; months: number[]; label: string }> = []
@@ -242,7 +242,7 @@ function runPass(
     const windowLabels = hyp.windows.map((w) => w.label)
     let hits = 0
     const tops: Array<{ id: string; s: number }> = []
-    for (const photo of PHOTOS) {
+    for (const photo of LIB) {
       const detail = scorePhoto(photo, hyp, parse)
       if (clarifyAlbum && photo.album === clarifyAlbum) {
         detail.score += WEIGHTS.clarifyAlbum + WEIGHTS.clarifyBonus
@@ -326,6 +326,13 @@ type DecisionOrEscalate = Decision | { kind: '__escalate' }
 const isEscalate = (d: DecisionOrEscalate): d is { kind: '__escalate' } =>
   (d as { kind: string }).kind === '__escalate'
 
+// The library defaults to the v1 synthetic roll; the evaluation harness can
+// inject the v2 label view so the SAME engine runs on the SAME candidates.
+let LIB: Photo[] = PHOTOS
+export function setLibrary(photos: Photo[]): void {
+  LIB = photos
+}
+
 export function retrieve(cue: string, opts: RetrieveOptions = {}): RetrievalResult {
   const started = Date.now()
   const parse = opts.parse ?? parseCue(cue)
@@ -400,8 +407,9 @@ export function retrieve(cue: string, opts: RetrieveOptions = {}): RetrievalResu
     hypotheses,
     passes,
     decision,
+    ranking: toScored(scoredMap).filter((s) => !s.photo.deleted).map((s) => ({ id: s.photo.id, score: s.score })),
     metrics: {
-      photosScanned: PHOTOS.length * passCount * hypotheses.length,
+      photosScanned: LIB.length * passCount * hypotheses.length,
       hypothesesRun: hypotheses.length * passCount,
       passes: passCount,
       clarificationsUsed: clarified ? 1 : 0,

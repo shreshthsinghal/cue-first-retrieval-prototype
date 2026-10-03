@@ -48,7 +48,7 @@ export function BenchmarkTab() {
   const [openCase, setOpenCase] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/benchmark')
+    fetch('/api/v1/benchmark')
       .then((r) => r.json())
       .then((d) => {
         if (d.error) throw new Error(d.error)

@@ -1,0 +1,1 @@
+export interface Item { id: string; file: string; ts: string; source: 'camera' | 'screenshot'; deleted: boolean; deletedNote?: string; license: string; attribution: string; generated: boolean; derivedFrom?: string; width: number; height: number; bytes: number }

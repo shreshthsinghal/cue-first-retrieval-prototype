@@ -83,7 +83,7 @@ export function RetrieveTab() {
     timers.current.push(setTimeout(() => setStage(3), 1850))
 
     try {
-      const res = await fetch('/api/retrieve', {
+      const res = await fetch('/api/v1/retrieve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cue: trimmed, clarify, parse: clarify ? carriedParse : undefined }),
