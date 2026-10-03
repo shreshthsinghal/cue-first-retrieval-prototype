@@ -153,6 +153,8 @@ export interface RetrievalResult {
   hypotheses: Hypothesis[]
   passes: PassTrace[]
   decision: Decision
+  /** Full living-photo ranking, for evaluation harnesses. Unused by the UI. */
+  ranking?: Array<{ id: string; score: number }>
   metrics: RetrievalMetrics
   /** Which stage parsed the cue: the language-model parser or its deterministic fallback. Set by the API layer. */
   parser?: 'neural' | 'deterministic'

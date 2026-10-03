@@ -8,3 +8,13 @@ out/
 *.log
 .DS_Store
 .env*
+
+# local build artifacts not for git
+cache-hf/
+library-raw/
+scripts-dev/
+eval/sheets/
+.eval-cache/
+
+# eval caches (regenerable)
+eval/embed-cache.json
