@@ -129,11 +129,12 @@ export function reasonLine(s: ScoredEntry, time: TimeEstimate, anchor: EventAnch
   const parts: string[] = []
   if (s.entry.hints.length) parts.push(`looks like your description: ${s.entry.hints[0]}`)
   else parts.push('visually the closest scene to your description')
-  if (time.center) {
-    const fit = s.timeBonus > -0.05 ? 'the date fits your estimate' : `captured ${formatDate(s.entry.ts)}, off from your estimate`
+  if (time.center && time.spreadDays >= 0) {
+    const hit = withinWindow(s.entry.ts, time.center, Math.max(1, time.spreadDays))
+    const fit = hit ? 'the date fits your estimate' : `captured ${formatDate(s.entry.ts)}, off from your estimate`
     parts.push(fit)
   }
-  if (anchor && s.eventBonus > -0.05) parts.push(`falls on ${anchor.label}`)
+  if (anchor && withinWindow(s.entry.ts, anchor.date, 3)) parts.push(`falls on ${anchor.label}`)
   if (s.clarifyBonus > 0) parts.push('picked by you in the clarifying question')
   return parts.join('; ') + '.'
 }
